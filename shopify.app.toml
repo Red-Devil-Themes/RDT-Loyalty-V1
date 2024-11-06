@@ -1,0 +1,33 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "4e259dbdbc62d6abe1dbe515c42c2014"
+name = "1105-loyalty-app"
+handle = "1105-loyalty-app"
+application_url = "https://totals-faster-boating-isbn.trycloudflare.com"
+embedded = true
+
+[build]
+include_config_on_deploy = true
+dev_store_url = "marco-ys-test-store.myshopify.com"
+automatically_update_urls_on_dev = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "write_products,read_orders"
+
+[auth]
+redirect_urls = [
+  "https://totals-faster-boating-isbn.trycloudflare.com/auth/callback",
+  "https://totals-faster-boating-isbn.trycloudflare.com/auth/shopify/callback",
+  "https://totals-faster-boating-isbn.trycloudflare.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2024-10"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/uninstalled" ]
+  uri = "/webhooks/app/uninstalled"
+
+[pos]
+embedded = false
