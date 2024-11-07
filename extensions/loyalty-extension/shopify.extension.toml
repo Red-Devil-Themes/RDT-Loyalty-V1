@@ -13,5 +13,5 @@ description = "An example loyalty extension"
 # and the file that contains your extension’s source code.
 [[extensions.targeting]]
 module = "./src/LoyaltyPointsBlock.tsx"
-target = "pos.order-details.block.render"
+target = "pos.customer-details.block.render"
 

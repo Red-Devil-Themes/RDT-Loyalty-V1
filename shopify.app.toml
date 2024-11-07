@@ -3,12 +3,12 @@
 client_id = "4e259dbdbc62d6abe1dbe515c42c2014"
 name = "1105-loyalty-app"
 handle = "1105-loyalty-app"
-application_url = "https://totals-faster-boating-isbn.trycloudflare.com"
+application_url = "https://unlock-imported-fioricet-acceptance.trycloudflare.com"
 embedded = true
 
 [build]
 include_config_on_deploy = true
-dev_store_url = "marco-ys-test-store.myshopify.com"
+dev_store_url = "1106mytestingstore.myshopify.com"
 automatically_update_urls_on_dev = true
 
 [access_scopes]
@@ -17,9 +17,9 @@ scopes = "write_products,read_orders"
 
 [auth]
 redirect_urls = [
-  "https://totals-faster-boating-isbn.trycloudflare.com/auth/callback",
-  "https://totals-faster-boating-isbn.trycloudflare.com/auth/shopify/callback",
-  "https://totals-faster-boating-isbn.trycloudflare.com/api/auth/callback"
+  "https://unlock-imported-fioricet-acceptance.trycloudflare.com/auth/callback",
+  "https://unlock-imported-fioricet-acceptance.trycloudflare.com/auth/shopify/callback",
+  "https://unlock-imported-fioricet-acceptance.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

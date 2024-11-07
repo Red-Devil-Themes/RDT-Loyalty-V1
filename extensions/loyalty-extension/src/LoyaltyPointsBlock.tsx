@@ -9,14 +9,15 @@ import {
 } from "@shopify/ui-extensions-react/point-of-sale";
 
 const LoyaltyPointsBlock = () => {
-  const api = useApi<"pos.order-details.block.render">();
+  const api = useApi<"pos.customer-details.block.render">();
   // const [totalPoints, setTotalPoints] = useState(0);
   // const [pointsEarned, setPointsEarned] = useState(0);
-  const [orderSubtotal, setOrderSubtotal] = useState<number | null>(null);
+  const [pointsTotal, setPointsTotal] = useState<number | null>(null);
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
-  const orderId = api.order.id;
-  const serverUrl = "https://totals-faster-boating-isbn.trycloudflare.com";
+  const customerId = api.customer.id;
+  const serverUrl =
+    "https://sep-nuts-improvements-revolution.trycloudflare.com";
 
   useEffect(() => {
     const fetchOrderData = async () => {
@@ -24,9 +25,10 @@ const LoyaltyPointsBlock = () => {
         // Get the session token
         const sessionToken = await api.session.getSessionToken();
 
-        console.log("CLient orderID:", orderId);
+        console.log("Client customerId:", customerId);
+        console.log("Client sessionToken:", sessionToken);
 
-        const response = await fetch(`${serverUrl}/orders/${orderId}`, {
+        const response = await fetch(`${serverUrl}/points/${customerId}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${sessionToken}`,
@@ -43,11 +45,11 @@ const LoyaltyPointsBlock = () => {
 
         const data = await response.json();
 
-        if (typeof data.subtotal === "number") {
-          setOrderSubtotal(data.subtotal);
-          console.log("Order subtotal received:", data.subtotal);
+        if (typeof data.totalPoints === "number") {
+          setPointsTotal(data.totalPoints);
+          console.log("Points total received:", data.totalPoints);
         } else {
-          console.error("No subtotal available in the response.");
+          console.error("No points available in the response.");
         }
       } catch (error) {
         console.error("Error fetching order data in client:", error);
@@ -57,14 +59,21 @@ const LoyaltyPointsBlock = () => {
     };
 
     fetchOrderData();
-  }, [api, orderId]);
+  }, [api, customerId]);
 
   if (loading) {
     return <Text>Loading...</Text>;
   }
 
-  if (orderSubtotal === null) {
-    return <Text>Unable to fetch order subtotal.</Text>;
+  if (pointsTotal === null) {
+    return (
+      <POSBlock>
+        <POSBlockRow>
+          <Text>Unable to fetch points total.</Text>
+          <Text variant="body">Response Status: {responseStatus}</Text>
+        </POSBlockRow>
+      </POSBlock>
+    );
   }
   // useEffect(() => {
   //   async function fetchPoints() {
@@ -100,14 +109,14 @@ const LoyaltyPointsBlock = () => {
     <POSBlock>
       <POSBlockRow>
         <Text variant="sectionHeader">Loyalty Points</Text>
-        <Text variant="body">OrderId: {orderId}</Text>
-        <Text variant="body">Order Amount: {orderSubtotal}</Text>
+        <Text variant="body">Customer ID: {customerId}</Text>
+        <Text variant="body">Total Points: {pointsTotal}</Text>
         <Text variant="body">Response Status: {responseStatus}</Text>
       </POSBlockRow>
     </POSBlock>
   );
 };
 
-export default reactExtension("pos.order-details.block.render", () => (
+export default reactExtension("pos.customer-details.block.render", () => (
   <LoyaltyPointsBlock />
 ));

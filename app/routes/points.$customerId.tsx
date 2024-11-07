@@ -1,25 +1,28 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
 import { json } from "@remix-run/node";
-import { fetchOrder } from "./ordersQuery";
+import { fetchCustomerTotal } from "./fetchCustomer";
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
-  console.log(JSON.stringify(request, null, 2));
+  console.log("LOADER", JSON.stringify(request, null, 2));
   await authenticate.admin(request);
-  const { orderId } = params;
+  const { customerId } = params;
 
-  if (!orderId) {
-    throw new Response("Order ID is required", { status: 400 });
+  if (!customerId) {
+    throw new Response("Customer ID is required", { status: 400 });
   }
 
-  const subtotal = await fetchOrder(request, orderId);
+  const data = await fetchCustomerTotal(request, customerId);
 
-  if (subtotal === null) {
+  if (data === null) {
     throw new Response("Order not found", { status: 404 });
   }
+  console.log("PATH LOG: ", data);
+
+  const totalPoints = data * 10;
 
   return json(
-    { subtotal },
+    { totalPoints },
     {
       headers: {
         // Allow requests from all origins (or specify your client origin)

@@ -3,14 +3,14 @@ import { redirect } from "@remix-run/node";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
-  const orderId = url.searchParams.get("orderId");
+  const customerId = url.searchParams.get("customerId");
 
-  if (orderId) {
-    // Redirect to /orders/$orderId, preserving other query parameters
-    return redirect(`/orders/${orderId}`);
+  if (customerId) {
+    // Redirect to /points/$customerId, preserving other query parameters
+    return redirect(`/points/${customerId}`);
   } else {
     // Handle missing orderId
-    return new Response("Order ID is missing", { status: 400 });
+    return new Response("Customer ID is missing", { status: 400 });
   }
 };
 
