@@ -13,8 +13,7 @@ import { useLoyaltyPoints } from "./useLoyaltyPoints";
 import { applyDiscount } from "./applyDiscount";
 
 // For development purposes, we'll use a local server
-export const serverUrl =
-  "https://future-places-coated-consumers.trycloudflare.com";
+export const serverUrl = "SERVER URL HERE";
 
 // 1. Define discount tiers and available discounts
 const discountTiers = [

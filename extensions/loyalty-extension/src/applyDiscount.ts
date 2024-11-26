@@ -10,6 +10,7 @@ export const applyDiscount = async <Target extends RenderExtensionTarget>(
   pointsToDeduct: number,
   setPointsTotal: React.Dispatch<React.SetStateAction<number | null>>,
 ) => {
+  // [START apply-discount.cart]
   // 1. Apply discount to cart using the Cart API
 
   api.cart.applyCartDiscount(
@@ -17,10 +18,11 @@ export const applyDiscount = async <Target extends RenderExtensionTarget>(
     "Loyalty Discount",
     discountValue.toString(),
   );
-
+  // [END apply-discount.cart]
   const sessionToken = await api.session.getSessionToken();
 
   // 2. Deduct points from server
+  // [START apply-discount.deduct]
   const response = await fetch(`${serverUrl}/points/${customerId}/deduct`, {
     method: "POST",
     headers: {
@@ -36,4 +38,5 @@ export const applyDiscount = async <Target extends RenderExtensionTarget>(
   }
   const { updatedPointsTotal } = await response.json();
   console.log("Updated points total:", updatedPointsTotal);
+  // [END apply-discount.deduct]
 };

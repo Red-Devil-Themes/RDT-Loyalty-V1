@@ -7,7 +7,7 @@ export const useLoyaltyPoints = (
   setPointsTotal: React.Dispatch<React.SetStateAction<number | null>>,
 ) => {
   const [loading, setLoading] = useState(true);
-
+  // [START use-loyalty-points.fetch]
   // 1. Fetch the points total from the server
   useEffect(() => {
     const fetchOrderData = async () => {
@@ -29,10 +29,12 @@ export const useLoyaltyPoints = (
         }
 
         const data = await response.json();
+        // [END use-loyalty-points.fetch]
 
         if (typeof data.totalPoints === "number") {
           // 2. Update the points total in the state
           setPointsTotal(data.totalPoints);
+          // [END use-loyalty-points.set]
         } else {
           console.error("No points available in the response.");
         }
