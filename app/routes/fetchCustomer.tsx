@@ -2,15 +2,18 @@ import { authenticate } from "app/shopify.server";
 
 export async function fetchCustomerTotal(request: Request, customerId: string) {
   try {
+    // 1. Authenticate the request
     const { admin } = await authenticate.admin(request);
 
+    // 2. Format the customer ID
     const formattedCustomerId = `gid://shopify/Customer/${customerId}`;
 
+    // 3. Fetch the customer's orders
     const response = await admin.graphql(
       `#graphql
        query GetCustomerOrders($customerId: ID!) {
          customer(id: $customerId) {
-           orders(first: 10) {
+           orders(first: 100) {
             edges {
               node {
                 id
@@ -27,7 +30,7 @@ export async function fetchCustomerTotal(request: Request, customerId: string) {
        }`,
       { variables: { customerId: formattedCustomerId } },
     );
-
+    // 4. Parse the response and handle erorrs
     const data = (await response.json()) as { data?: any; errors?: any[] };
     let grandTotal = 0;
 
@@ -36,10 +39,6 @@ export async function fetchCustomerTotal(request: Request, customerId: string) {
       data.errors.forEach((error: any) => {
         console.error("GraphQL Error Details:", error);
       });
-      return null;
-    }
-    if (data.errors) {
-      console.error("GraphQL Errors:", data.errors);
       return null;
     }
 
@@ -53,6 +52,7 @@ export async function fetchCustomerTotal(request: Request, customerId: string) {
       console.error("No orders found for customer");
       return null;
     }
+    // 5. Calculate the grand total and return
     for (const edge of orders.edges) {
       const amountString = edge.node.currentSubtotalPriceSet.shopMoney.amount;
       if (amountString) {

@@ -7,7 +7,7 @@ type = "ui_extension"
 name = "loyalty-extension"
 
 handle = "loyalty-extension"
-description = "An example loyalty extension"
+description = "Loyalty Points Extension"
 
 # Controls where in POS your extension will be injected,
 # and the file that contains your extension’s source code.

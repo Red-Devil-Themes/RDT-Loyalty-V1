@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import {
   reactExtension,
@@ -6,60 +6,36 @@ import {
   Text,
   POSBlockRow,
   useApi,
+  Button,
 } from "@shopify/ui-extensions-react/point-of-sale";
 
+import { useLoyaltyPoints } from "./useLoyaltyPoints";
+import { applyDiscount } from "./applyDiscount";
+
+// For development purposes, we'll use a local server
+export const serverUrl =
+  "https://future-places-coated-consumers.trycloudflare.com";
+
+// 1. Define discount tiers and available discounts
+const discountTiers = [
+  { pointsRequired: 100, discountValue: 5 },
+  { pointsRequired: 200, discountValue: 10 },
+  { pointsRequired: 300, discountValue: 15 },
+];
+
 const LoyaltyPointsBlock = () => {
+  // 2. Initialize API
   const api = useApi<"pos.customer-details.block.render">();
-  // const [totalPoints, setTotalPoints] = useState(0);
-  // const [pointsEarned, setPointsEarned] = useState(0);
-  const [pointsTotal, setPointsTotal] = useState<number | null>(null);
-  const [responseStatus, setResponseStatus] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
   const customerId = api.customer.id;
-  const serverUrl =
-    "https://sep-nuts-improvements-revolution.trycloudflare.com";
+  const [pointsTotal, setPointsTotal] = useState<number | null>(null);
 
-  useEffect(() => {
-    const fetchOrderData = async () => {
-      try {
-        // Get the session token
-        const sessionToken = await api.session.getSessionToken();
+  // 3. Pass setPointsTotal to useLoyaltyPoints to calculate the points total
+  const { loading } = useLoyaltyPoints(api, customerId, setPointsTotal);
 
-        console.log("Client customerId:", customerId);
-        console.log("Client sessionToken:", sessionToken);
-
-        const response = await fetch(`${serverUrl}/points/${customerId}`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${sessionToken}`,
-          },
-        });
-
-        setResponseStatus(response.status);
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error("Error Response Text:", errorText);
-          throw new Error(`Failed to fetch order data: ${errorText}`);
-        }
-
-        const data = await response.json();
-
-        if (typeof data.totalPoints === "number") {
-          setPointsTotal(data.totalPoints);
-          console.log("Points total received:", data.totalPoints);
-        } else {
-          console.error("No points available in the response.");
-        }
-      } catch (error) {
-        console.error("Error fetching order data in client:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrderData();
-  }, [api, customerId]);
+  // 4. Filter available discounts based on points total
+  const availableDiscounts = pointsTotal
+    ? discountTiers.filter((tier) => pointsTotal >= tier.pointsRequired)
+    : [];
 
   if (loading) {
     return <Text>Loading...</Text>;
@@ -69,54 +45,53 @@ const LoyaltyPointsBlock = () => {
     return (
       <POSBlock>
         <POSBlockRow>
-          <Text>Unable to fetch points total.</Text>
-          <Text variant="body">Response Status: {responseStatus}</Text>
+          <Text color="TextWarning">Unable to fetch points total.</Text>
         </POSBlockRow>
       </POSBlock>
     );
   }
-  // useEffect(() => {
-  //   async function fetchPoints() {
-  //     if (!customer) return;
-  //     const points = await getCustomerPoints(customer);
-  //     setTotalPoints(points);
-  //   }
-  //   fetchPoints();
-  // }, [customer]);
-
-  // const handleAddPoints = useCallback(async () => {
-  //   if (customer) {
-  //     const points = await getCustomerPoints(customer);
-  //     const subtotal = parseInt(cart?.subtotal || "0");
-  //     const pointsToAdd = Math.floor(subtotal / 100);
-  //     setPointsEarned(pointsToAdd);
-  //     await addOrUpdateCustomerPoints(customer, points + pointsToAdd);
-  //     const updatedPoints = await getCustomerPoints(customer);
-  //     setTotalPoints(updatedPoints);
-  //   } else {
-  //     console.error("No customer found");
-  //   }
-  // }, [cart, customer]);
-
-  // useEffect(() => {
-  //   async function initializePoints() {
-  //     await handleAddPoints();
-  //   }
-  //   initializePoints();
-  // }, [handleAddPoints]);
-
   return (
     <POSBlock>
       <POSBlockRow>
-        <Text variant="sectionHeader">Loyalty Points</Text>
-        <Text variant="body">Customer ID: {customerId}</Text>
-        <Text variant="body">Total Points: {pointsTotal}</Text>
-        <Text variant="body">Response Status: {responseStatus}</Text>
+        <Text variant="headingLarge" color="TextSuccess">
+          {/* 5. Display the points total */}
+          Point Balance:{pointsTotal}
+        </Text>
       </POSBlockRow>
+
+      {availableDiscounts.length > 0 ? (
+        <POSBlockRow>
+          <Text variant="headingSmall">Available Discounts:</Text>
+          {/* 6. Display available discounts as buttons, calling applyDiscount */}
+          {availableDiscounts.map((tier, index) => (
+            <POSBlockRow key={`${tier.pointsRequired}-${index}`}>
+              <Button
+                title={`Redeem $${tier.discountValue} Discount (Use ${tier.pointsRequired} points)`}
+                type="primary"
+                onPress={() =>
+                  applyDiscount(
+                    api,
+                    customerId,
+                    tier.discountValue,
+                    tier.pointsRequired,
+                    setPointsTotal,
+                  )
+                }
+              />
+            </POSBlockRow>
+          ))}
+        </POSBlockRow>
+      ) : (
+        <POSBlockRow>
+          <Text variant="headingSmall" color="TextWarning">
+            No available discounts.
+          </Text>
+        </POSBlockRow>
+      )}
     </POSBlock>
   );
 };
-
+// 7. Render the LoyaltyPointsBlock component at the appropriate target
 export default reactExtension("pos.customer-details.block.render", () => (
   <LoyaltyPointsBlock />
 ));
