@@ -13,7 +13,8 @@ import { useLoyaltyPoints } from "./useLoyaltyPoints";
 import { applyDiscount } from "./applyDiscount";
 
 // For development purposes, we'll use a local server
-export const serverUrl = "SERVER URL HERE";
+export const serverUrl =
+  "https://hrs-macintosh-graph-testimonials.trycloudflare.com";
 // [START loyalty-points-block.discounts]
 // 1. Define discount tiers and available discounts
 const discountTiers = [

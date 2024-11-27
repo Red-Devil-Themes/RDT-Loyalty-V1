@@ -32,6 +32,7 @@ export const useLoyaltyPoints = (
         // [END use-loyalty-points.fetch]
 
         if (typeof data.totalPoints === "number") {
+          // [START use-loyalty-points.set]
           // 2. Update the points total in the state
           setPointsTotal(data.totalPoints);
           // [END use-loyalty-points.set]
