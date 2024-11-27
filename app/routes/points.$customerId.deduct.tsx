@@ -2,7 +2,7 @@ import type { ActionFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { addRedeemedPoints } from "../services/redeemedPoints.server";
 import { authenticate } from "app/shopify.server";
-
+// [START points.deduct.action]
 export const action: ActionFunction = async ({ request, params }) => {
   if (request.method === "OPTIONS") {
     return new Response(null, {
@@ -35,3 +35,4 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   return json({ message: "Points deducted successfully" });
 };
+// [END points.deduct.action]
